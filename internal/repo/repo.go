@@ -7,9 +7,10 @@ import (
 )
 
 type Repo interface {
-	AddSubscription(ctx context.Context, adURL string, email string, emailID uint64) error
+	AddSubscription(ctx context.Context, adID uint64, email string) error
+	AddSubscriptionIfEmailExists(ctx context.Context, adID uint64, email string) error
 	GetEmailID(ctx context.Context, email string) (uint64, error)
-	GetAdsByEmailID(ctx context.Context, emailID uint64) ([]string, error)
+	GetEmailsByAdID(ctx context.Context, adID uint64) ([]string, error)
 }
 
 type Opts struct {

@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	CreateSubscription(ctx context.Context, email, adURL string) error
+	CreateSubscription(ctx context.Context, email string, adID uint64) error
 }
 
 func New(repo repo.Repo) Service {

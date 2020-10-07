@@ -26,7 +26,7 @@ func (s *Server) Router() fasthttp.RequestHandler {
 }
 
 type request struct {
-	adURL string `json:"ad"`
+	adID uint64 `json:"ad"`
 	email string `json:"email"`
 }
 
@@ -46,7 +46,7 @@ func (s *Server) subscribe(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err := s.service.CreateSubscription(ctx, req.email, req.adURL); err != nil {
+	if err := s.service.CreateSubscription(ctx, req.email, req.adID); err != nil {
 		if err == service.ErrSubscriptionExists {
 			ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		}

@@ -10,7 +10,7 @@ type appService struct {
 
 }
 
-func (s *appService) CreateSubscription(ctx context.Context, email, adURL string) error {
+func (s *appService) CreateSubscription(ctx context.Context, email string, adID uint64) error {
 	emailID, err := s.repo.GetEmailID(ctx, email)
 	if err != nil {
 		return err
@@ -18,13 +18,13 @@ func (s *appService) CreateSubscription(ctx context.Context, email, adURL string
 
 	if emailID != 0 {
 		adExists := false
-		ads, err := s.repo.GetAdsByEmailID(ctx, emailID)
+		emails, err := s.repo.GetEmailsByAdID(ctx, adID)
 		if err != nil {
 			return err
 		}
 
-		for i := range ads {
-			if ads[i] == adURL {
+		for i := range emails {
+			if emails[i] == email {
 				adExists = true
 			}
 		}
@@ -33,14 +33,14 @@ func (s *appService) CreateSubscription(ctx context.Context, email, adURL string
 			return ErrSubscriptionExists
 		}
 
-		if err := s.repo.AddSubscription(ctx, adURL, email, emailID); err != nil {
+		if err := s.repo.AddSubscriptionIfEmailExists(ctx, adID, email); err != nil {
 			return err
 		}
 
 		return nil
 	}
 
-	if err := s.repo.AddSubscription(ctx, adURL, email, emailID); err != nil {
+	if err := s.repo.AddSubscription(ctx, adID, email); err != nil {
 		return err
 	}
 
