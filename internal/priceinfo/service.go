@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-type clientService interface {
-	GetPriceByAdID(adID uint64) (uint64, error)
+type Service interface {
+	GetPriceByAd(ad uint64) (string, error)
 }
 
 type Opts struct {
@@ -14,7 +14,7 @@ type Opts struct {
 	Timeout int
 }
 
-func New(opts Opts) clientService {
+func New(opts Opts) Service {
 	return &client{
 		client: fasthttp.Client {},
 		addr: opts.Addr,

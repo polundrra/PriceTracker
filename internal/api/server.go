@@ -5,8 +5,10 @@ import (
 	"github.com/fasthttp/router"
 	"github.com/polundrra/PriceTracker/internal/service"
 	"github.com/valyala/fasthttp"
+	"log"
 	"net"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -26,7 +28,7 @@ func (s *Server) Router() fasthttp.RequestHandler {
 }
 
 type request struct {
-	adID uint64 `json:"ad"`
+	adURL string `json:"ad"`
 	email string `json:"email"`
 }
 
@@ -38,15 +40,20 @@ func (s *Server) subscribe(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	//ВАЛИДАЦИЯ ССЫЛКИ ОБЪЯВЛЕНИЯ??
-
 	if !isValidEmail(req.email) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		ctx.WriteString("invalid email")
 		return
 	}
 
-	if err := s.service.CreateSubscription(ctx, req.email, req.adID); err != nil {
+	regex := regexp.MustCompile("[0-9]{10}$")
+	ad, err := strconv.Atoi(regex.FindString(req.adURL))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if err := s.service.CreateSubscription(ctx, req.email, uint64(ad)); err != nil {
 		if err == service.ErrSubscriptionExists {
 			ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		}

@@ -4,6 +4,14 @@ create table if not exists mail (
 );
 
 create table if not exists subscription (
-    email_id int not null,
-    ad_id varchar(255) not null
+    email_id int references mail,
+    ad_id int references advertisement
+
+)
+
+create table if not exists advertisement (
+    id serial primary key,
+    ad bigint not null unique,
+    price varchar(9) not null,
+    last_check_at timestamp not null default now()
 )

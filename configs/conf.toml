@@ -13,4 +13,5 @@ Timeout = 1
 
 [ClientOpts]
 Addr = "https://m.avito.ru/api/14/items/"
+key = "?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&action=view&context=H4sIAAAAAAAA_wE-AMH_YToxOntzOjE6IngiO3M6NDA6ImNhMjczODhjMDVkNGU5OTBhNGFiNDRkNTJmMzQ2ODM1ZDJkMDBkYjgiO33fxEa9PgAAAA"
 Timeout = 1

@@ -5,21 +5,21 @@ import (
 	"github.com/buger/jsonparser"
 	"github.com/valyala/fasthttp"
 	"log"
-	"strconv"
 	"time"
 )
 
 type client struct {
-	client   fasthttp.Client
-	addr     string
-	timeout  time.Duration
+	client  fasthttp.Client
+	addr    string
+	key     string
+	timeout time.Duration
 }
 
-func (c *client) GetPriceByAdID(adID uint64) (uint64, error) {
+func (c *client) GetPriceByAd(ad uint64) (string, error) {
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
 
-	req.SetRequestURI(c.addr + string(adID))
+	req.SetRequestURI(c.addr + string(ad) + c.key)
 	req.Header.SetMethod(fasthttp.MethodGet)
 
 	resp := fasthttp.AcquireResponse()
@@ -27,23 +27,18 @@ func (c *client) GetPriceByAdID(adID uint64) (uint64, error) {
 
 	if err := c.client.DoTimeout(req, resp, c.timeout); err != nil {
 		log.Println(err, c.addr, c.timeout)
-		return 0, fmt.Errorf("Client get failed: %s\n", err)
+		return "", fmt.Errorf("Client get failed: %s\n", err)
 	}
 
 	if resp.StatusCode() != 200 {
-		return 0, fmt.Errorf("Expected status code %d but got %d\n", fasthttp.StatusOK, resp.StatusCode())
+		return "", fmt.Errorf("Expected status code %d but got %d\n", fasthttp.StatusOK, resp.StatusCode())
 	}
 
 	body := resp.Body()
-	value, err := jsonparser.GetString(body, "price", "value")
+	price, err := jsonparser.GetString(body, "price", "value")
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	price, err := strconv.Atoi(value)
-	if err != nil {
-		return 0, err
-	}
-
-	return uint64(price), nil
+	return price, nil
 }
