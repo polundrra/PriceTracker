@@ -30,7 +30,7 @@ func (p *postgres) AddSubscription(ctx context.Context, adID uint64, email strin
 
 	var emailID uint64
 	if err := tx.QueryRowEx(ctx, "insert into mail(email) values ($1) returning id", nil, email).Scan(&emailID); err != nil {
-		return fmt.Errorf("error insert into email, %v", err)
+		return fmt.Errorf("error insert into mail, %v", err)
 	}
 
 	if _, err := tx.ExecEx(ctx, "insert into subscription(email_id, ad_id) values ($1, $2)", nil, emailID, adID); err != nil {

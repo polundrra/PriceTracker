@@ -1,0 +1,16 @@
+ServerPort = ":9000"
+ReadTimeout = 3
+IdleTimeout = 3
+WriteTimeout = 3
+
+[RepoOpts]
+Host = "db"
+Port = 5432
+Database = "shortlink"
+User = "superuser"
+Password = "secret"
+Timeout = 1
+
+[ClientOpts]
+Addr = "https://m.avito.ru/api/14/items/"
+Timeout = 1

@@ -3,6 +3,7 @@ module github.com/polundrra/PriceTracker
 go 1.14
 
 require (
+	github.com/buger/jsonparser v1.0.0
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/fasthttp/router v1.3.2
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect

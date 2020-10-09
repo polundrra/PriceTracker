@@ -37,6 +37,7 @@ func (s *appService) CreateSubscription(ctx context.Context, email string, adID 
 			return err
 		}
 
+
 		return nil
 	}
 
