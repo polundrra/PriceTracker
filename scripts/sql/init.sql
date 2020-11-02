@@ -12,6 +12,6 @@ create table if not exists subscription (
 create table if not exists advertisement (
     id serial primary key,
     ad bigint not null unique,
-    price varchar(9) not null,
+    price bigint not null,
     last_check_at timestamp not null default now()
 )

@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	GetPriceByAd(ad uint64) (string, error)
+	GetPriceByAd(ad uint64) (uint64, error)
 }
 
 type Opts struct {

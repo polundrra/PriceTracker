@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-	"github.com/polundrra/PriceTracker/internal/priceinfo"
-	"github.com/polundrra/PriceTracker/internal/repo"
+	"github.com/polundrra/PriceTracker/internal/tracker/priceinfo"
+	"github.com/polundrra/PriceTracker/internal/tracker/repo"
 	"time"
 )
 
 type appService struct {
-	repo repo.Repo
+	repo        repo.Repo
 	priceClient priceinfo.Service
 }
 
@@ -33,7 +33,7 @@ func (s *appService) GetInfoForMailing(ctx context.Context) ([]Message, error) {
 
 func (s *appService) UpdatePrice(ctx context.Context) error {
 	t := time.Hour
-	ads, err := s.repo.GetAdsForCheck(ctx, t)
+	ads, err := s.repo.GetAdsByLastCheck(ctx, t)
 	if err != nil {
 		return err
 	}

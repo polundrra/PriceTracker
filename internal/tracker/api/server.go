@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"github.com/fasthttp/router"
-	"github.com/polundrra/PriceTracker/internal/service"
+	"github.com/polundrra/PriceTracker/internal/tracker/service"
 	"github.com/valyala/fasthttp"
 	"log"
 	"net"

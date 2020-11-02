@@ -3,21 +3,19 @@ package repo
 import (
 	"context"
 	"github.com/jackc/pgx"
-	"github.com/polundrra/PriceTracker/internal/service"
 	"time"
 )
 
 type Repo interface {
 	AddSubscription(ctx context.Context, ad uint64, email string) error
 	AddEmail(ctx context.Context, email string) error
-	AddAd(ctx context.Context, ad uint64, price string) error
+	AddAd(ctx context.Context, ad uint64, price uint64) error
 	GetEmailID(ctx context.Context, email string) (uint64, error)
 	GetAdID(ctx context.Context, ad uint64) (uint64, error)
 	GetEmailsByAd(ctx context.Context, ad uint64) ([]string, error)
-	GetPriceByAd(ctx context.Context, ad uint64) (string, error)
-	UpdatePrice(ctx context.Context, ad uint64, price string) error
-	GetAdsForCheck(ctx context.Context, period time.Duration) ([]uint64, error)
-	GetInfoForMailing(ctx context.Context, dif time.Duration) ([]service.Message, error)
+	GetPriceByAd(ctx context.Context, ad uint64) (uint64, error)
+	UpdatePrice(ctx context.Context, ad uint64, price uint64) error
+	GetAdsByLastCheck(ctx context.Context, period time.Duration) ([]uint64, error)
 }
 
 type Opts struct {

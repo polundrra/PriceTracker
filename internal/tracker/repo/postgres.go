@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx"
-	"github.com/polundrra/PriceTracker/internal/service"
 	"log"
 	"time"
 )
@@ -14,34 +13,8 @@ type postgres struct {
 	timeout time.Duration
 }
 
-func (p *postgres) GetInfoForMailing(ctx context.Context, dif time.Duration) ([]service.Message, error) {
-	ctx, cancel := context.WithTimeout(ctx, p.timeout)
-	defer cancel()
 
-	start := time.Now()
-	t := start.Add(-dif)
-	rows, err := p.pool.QueryEx(ctx, "select m.email, a.price from subscription s inner join mail m on m.id = s.mail_id" +
-		"inner join advertisement a on s.ad_id = a.id where last_check_at >= $1", nil, t)
-	if err != nil {
-		return nil, fmt.Errorf("error get info, %v", err)
-	}
-
-	var messages []service.Message
-	var message service.Message
-	for rows.Next() {
-		if err := rows.Scan(&message); err != nil {
-			if err == pgx.ErrNoRows {
-				return nil, nil
-			}
-			return nil, fmt.Errorf("err scan rows in GetInfoForMailing, %v", err)
-		}
-		messages = append(messages, message)
-	}
-
-	return messages, nil
-}
-
-func (p *postgres) UpdatePrice(ctx context.Context, ad uint64, price string) error {
+func (p *postgres) UpdatePrice(ctx context.Context, ad uint64, price uint64) error {
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
@@ -52,13 +25,13 @@ func (p *postgres) UpdatePrice(ctx context.Context, ad uint64, price string) err
 	return nil
 }
 
-func (p *postgres) GetPriceByAd(ctx context.Context, ad uint64) (string, error) {
+func (p *postgres) GetPriceByAd(ctx context.Context, ad uint64) (uint64, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
-	var price string
+	var price uint64
 	if err := p.pool.QueryRowEx(ctx, "select price from advertisement where ad = $1", nil, ad).Scan(&price); err != nil {
-		return "", fmt.Errorf("error get price by ad id, %v", err)
+		return 0, fmt.Errorf("error get price by ad, %v", err)
 	}
 
 	return price, nil
@@ -111,7 +84,7 @@ func (p *postgres) AddEmail(ctx context.Context, email string) error {
 	return nil
 }
 
-func (p *postgres) AddAd(ctx context.Context, ad uint64, price string) error {
+func (p *postgres) AddAd(ctx context.Context, ad uint64, price uint64) error {
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
@@ -162,9 +135,9 @@ func (p *postgres) GetEmailsByAd(ctx context.Context, ad uint64) ([]string, erro
 	var email string
 
 	rows, err := p.pool.QueryEx(ctx, "select email from mail m inner join subscription s on m.id = s.email_id " +
-		"where ad_id = $1", nil, ad)
+		"where ad_id = (select id from advertisement where ad = $1)", nil, ad)
 	if err != nil {
-		return nil, fmt.Errorf("error get emails by ad id, %v", err)
+		return nil, fmt.Errorf("error get emails by ad, %v", err)
 	}
 
 	for rows.Next() {
@@ -181,7 +154,7 @@ func (p *postgres) GetEmailsByAd(ctx context.Context, ad uint64) ([]string, erro
 }
 
 
-func (p *postgres) GetAdsForCheck(ctx context.Context, period time.Duration) ([]uint64, error) {
+func (p *postgres) GetAdsByLastCheck(ctx context.Context, period time.Duration) ([]uint64, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
@@ -199,7 +172,7 @@ func (p *postgres) GetAdsForCheck(ctx context.Context, period time.Duration) ([]
 			if err == pgx.ErrNoRows {
 				return nil, nil
 			}
-			return nil, fmt.Errorf("err scan rows in GetEmailByAd, %v", err)
+			return nil, fmt.Errorf("err scan rows in GetAdsByLastCheck, %v", err)
 		}
 		ads = append(ads, ad)
 	}
